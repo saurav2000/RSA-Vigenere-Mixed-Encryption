@@ -1,4 +1,5 @@
 #include "CA.h"
+using namespace std;
 
 big_int ext_gcd(big_int a, big_int b, big_int *x, big_int *y)
 {
@@ -20,19 +21,6 @@ big_int mod_inv(big_int a, big_int n)
 	big_int x, y;
 	ext_gcd(a, n, &x, &y);
 	return ((x%n)+n)%n;
-}
-
-big_int mod_exp(big_int a, big_int b, big_int n)
-{
-	big_int res = 1;
-	while(b!=0)
-	{
-		if((b&1)==1)
-			res = (res * a) % n;
-		b = b>>1;
-		a = (a*a) % n;
-	}
-	return res;
 }
 
 bool miller_rabin(gmp_randclass &rand_gen, big_int n)
@@ -113,7 +101,7 @@ void generate_key(gmp_randclass &rand_gen, big_int bit_cnt, char *public_file, c
 	fout<<e<<"\n"<<N<<"\n";
 	fout.close();
 	fout.open(private_file);
-	fout<<d<<"\n"<<e<<"\n"<<N<<"\n"<<p<<"\n"<<q<<"\n";
+	fout<<d<<"\n"<<N<<"\n"<<p<<"\n"<<q<<"\n";
 	fout.close();
 }
 
