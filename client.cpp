@@ -56,7 +56,7 @@ string RSA_encrypt(string input, big_int e, big_int N)
 	return encrypted;
 }
 
-string RSA_decrypt(string input, big_int d, big_int N, big_int p, big_int q)
+string RSA_decrypt(string input, big_int d, big_int N, big_int p, big_int dp, big_int pmul, big_int q, big_int dq, big_int qmul, bool CRT)
 {
 	int seg_size = log(N)+1, n = input.length();
 	string decrypted = "";
@@ -76,7 +76,16 @@ string RSA_decrypt(string input, big_int d, big_int N, big_int p, big_int q)
 			mult = mult*40;
 		}
 
-		big_int M = mod_exp(C, d, N);
+		big_int M = 0;
+		if(!CRT)
+			M = mod_exp(C, d, N);
+		else
+		{
+			big_int cp = C%p, cq = C%q;
+			big_int mp = mod_exp(cp, dp, p), mq = mod_exp(cq, dq, q);
+			M = (mp*pmul + mq*qmul)%N;
+		}
+
 		string res = "";
 		while(M!=0)
 		{
@@ -106,15 +115,21 @@ string vigenere(string a, string key, bool encrypt)
 	return res;
 }
 
-void encrypt(char *key_file, char *text_file, char *output_file)
+void encrypt(char *vigenere_key, char *send_priv_key, char *recp_pub_key, char *text_file, char *output_file)
 {
 	ifstream fin;
-	fin.open(key_file);
-	string vig_key = "";
+	string vig_key;
+	big_int d, N_send, p, q, e, N_recp, dp, dq, pmul, qmul;
+	
+	fin.open(vigenere_key);
 	fin>>vig_key;
-	big_int d, N_send, p, q;
-	fin>>d>>N_send>>p>>q;
-	big_int e, N_recp;
+	fin.close();
+
+	fin.open(send_priv_key);
+	fin>>d>>N_send>>p>>dp>>pmul>>q>>dq>>qmul;
+	fin.close();
+
+	fin.open(recp_pub_key);
 	fin>>e>>N_recp;
 	fin.close();
 
@@ -122,7 +137,7 @@ void encrypt(char *key_file, char *text_file, char *output_file)
 	string res = "", line ;
 	while(getline(fin, line))
 		res+= (line+" ");
-	cout<<res<<"\n";
+	transform(res.begin(), res.end(), res.begin(), ::tolower);
 	fin.close();
 
 	res = vigenere(res, vig_key, true);
@@ -135,12 +150,17 @@ void encrypt(char *key_file, char *text_file, char *output_file)
 	fout.close();
 }
 
-void decrypt(char *key_file, char *text_file, char *output_file)
+void decrypt(char *recp_priv_key, char *send_pub_key, char *text_file, char *output_file)
 {
 	ifstream fin;
-	fin.open(key_file);
-	big_int d, N_recp, p, q, e, N_send;
-	fin>>d>>N_recp>>e>>N_send>>p>>q;
+	big_int d, N_recp, p, q, e, N_send, dp, dq, pmul, qmul;
+	
+	fin.open(recp_priv_key);
+	fin>>d>>N_recp>>p>>dp>>pmul>>q>>dq>>qmul;
+	fin.close();
+
+	fin.open(send_pub_key);
+	fin>>e>>N_send;
 	fin.close();
 
 	string res = "";
@@ -148,8 +168,8 @@ void decrypt(char *key_file, char *text_file, char *output_file)
 	getline(fin, res);
 	fin.close();
 
-	res = RSA_decrypt(res, e, N_send, p, q);
-	res = RSA_decrypt(res, d, N_recp, p, q);
+	res = RSA_decrypt(res, d, N_recp, p, dp, pmul, q, dq, qmul, true);
+	res = RSA_decrypt(res, e, N_send, p, dp ,pmul, q, dq, qmul, false);
 	res = rtrim(res);
 	int i = (int)res.length()-1;
 	for(;i>=0;--i)
