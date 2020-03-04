@@ -17,7 +17,7 @@ int char_to_int(char x)
 		return x-93;
 	if(x<=57 && x>=48)
 		return x-18;
-	return -1;
+	return 0;
 }
 
 char int_to_char(int x)
