@@ -95,20 +95,22 @@ void generate_key(gmp_randclass &rand_gen, big_int bit_cnt, char *public_file, c
 	big_int phi = (p-1)*(q-1);
 	big_int e = 0;
 	while(e!=1 && gcd(e, phi)!=1)
-		e = rand_gen.get_z_range(phi);
+		e = rand_gen.get_z_range(1000000);
 	big_int d = mod_inv(e, phi);
+	big_int dp = d%(p-1);
+	big_int dq = d%(q-1);
+	big_int pmul = mod_exp(q, p-1, N);
+	big_int qmul = mod_exp(p, q-1, N);
 	ofstream fout(public_file);
 	fout<<e<<"\n"<<N<<"\n";
 	fout.close();
 	fout.open(private_file);
-	fout<<d<<"\n"<<N<<"\n"<<p<<"\n"<<q<<"\n";
+	fout<<d<<"\n"<<N<<"\n"<<p<<"\n"<<dp<<"\n"<<pmul<<"\n"<<q<<"\n"<<dq<<"\n"<<qmul<<"\n";
 	fout.close();
 }
 
-void generate_key(int bit_count, char *public_file, char *private_file)
+void generate_key(gmp_randclass &rand_gen, int bit_count, char *public_file, char *private_file)
 {
 	big_int b = bit_count;
-	gmp_randclass rand_gen(gmp_randinit_mt);
-	rand_gen.seed(time(NULL));
 	generate_key(rand_gen, b, public_file, private_file);
 }
