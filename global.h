@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 #include <gmpxx.h>
 int char_to_int(char x);
 char int_to_char(int x);
