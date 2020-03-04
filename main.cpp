@@ -4,12 +4,12 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
-	// generate_key(128, "A_pub", "A_priv");
-	// generate_key(128, "B_pub", "B_priv");
-	// encrypt("encr", "text", "encrypted");
-	// decrypt("decr", "encrypted", "decrypted");
-	// string s = "india is my country. all indians are my brother's and sister's, but this is 2019.  ";
-	// cout<<vigenere(vigenere(s, "h.e'llo20", true), "h.e'llo20", false)<<"\n";
+	gmp_randclass rand_gen(gmp_randinit_mt);
+	rand_gen.seed(time(NULL));
 
+	generate_key(rand_gen, 512, "A_pub", "A_priv");
+	generate_key(rand_gen, 512, "B_pub", "B_priv");
+	encrypt("vig", "A_priv", "B_pub", "tex", "encrypted");
+	decrypt("B_priv", "A_pub", "encrypted", "decrypted");
 	return 0;
 }
