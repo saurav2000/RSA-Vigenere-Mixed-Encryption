@@ -3,13 +3,13 @@ all: global.o client.o CA.o main.o
 	rm *.o
 
 main.o: main.cpp client.h CA.h
-	g++ -c main.cpp
+	g++ -c main.cpp -w
 
 client.o: client.cpp client.h global.o
-	g++ -c client.cpp
+	g++ -c client.cpp -w
 
 CA.o: CA.cpp CA.h global.o
-	g++ -c CA.cpp
+	g++ -c CA.cpp -w
 
 global.o: global.cpp global.h
-	g++ -c global.cpp
+	g++ -c global.cpp -w
