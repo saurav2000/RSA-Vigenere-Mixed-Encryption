@@ -1,0 +1,13 @@
+# keys
+*_priv
+*_pub
+vig
+
+#text files
+encrypted
+decrypted
+tex
+
+# object files
+*.o
+main
